@@ -530,10 +530,9 @@ def classifications():
         model_id = form.model.data
         clf_output = classify_image(model_id=model_id, 
                                     img_id=image_id)
-        result = dict(image_id=image_id,model_id=model_id,
-                      data=clf_output)
+        result = dict(data=clf_output)
         return render_template('classification_output.html', 
-                               results=result)
+                               results=result, image_id=image_id)
     return render_template('classification_select.html', 
                            form=form)
                 
