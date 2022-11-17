@@ -22,10 +22,23 @@ def classifications():
         model_id = form.model.data
         # TODO create the result_dict, with a key 'data' that stores
         #  the output of the classification function
-        result_dict = dict()
+
+        redis_url = config.REDIS_URL
+        redis_connection = redis.from_url(redis_url)
+        with Connection(redis_connection):
+            q = Queue(name=config.QUEUE)
+        job = Job.create(classify_image,
+                         kwargs=dict(model_id=model_id,
+                                     img_id=image_id))
+        task = q.enqueue_job(job)
+        return render_template('classification_output_queue.html', image_id = image_id,
+                   jobID = task.get_id())
+        #clf_output = classify_image(model_id=model_id, img_id=image_id)
+        #result = dict(data=clf_output)
+
 
         # returns the image classification output from the specified model
-        return render_template('classification_output.html', image_id=image_id, results=result_dict)
+        #return render_template('classification_output.html', image_id=image_id, results=result)
 
     # otherwise, it is a get request and should return the
     # image and model selector
